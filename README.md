@@ -24,9 +24,18 @@ This will start:
 - PostgreSQL
 - Redis
 
-### 3. Access the API and admin
+### 3. Access the API
 - Main API: http://localhost:8000/
-- Django admin: http://localhost:8000/admin/
+
+#### How to test all API endpoints (full paths):
+- List users: `GET http://localhost:8000/api/users/`
+- Retrieve user: `GET http://localhost:8000/api/users/<id>/`
+- List addresses: `GET http://localhost:8000/api/addresses/`
+- Retrieve address: `GET http://localhost:8000/api/addresses/<id>/`
+- List credit cards: `GET http://localhost:8000/api/creditcards/`
+- Retrieve credit card: `GET http://localhost:8000/api/creditcards/<id>/`
+
+You can test these endpoints using curl, httpie, Postman, or your browser (for GET requests).
 
 > **Note:** All containers (web, db, redis, celery, celery-beat) must be running for the following commands.
 
@@ -70,3 +79,18 @@ docker-compose down
 
 ## Author
 Yura Komarnitskyi
+
+---
+
+## Celery Beat schedule examples
+- Every hour: `crontab(minute=0)`
+
+Example usage in `app/app/celerybeat_schedule.py`:
+```python
+beat_schedule = {
+    'fetch-next-user': {
+        'task': 'user.tasks.fetch_and_save_next_user',
+        'schedule': crontab(minute='*/15'),  # change to '*/30' or 0 as needed
+    },
+}
+```
