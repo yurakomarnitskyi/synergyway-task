@@ -1,0 +1,6 @@
+[tool.ruff]
+line-length = 88
+exclude = [".git", "__pycache__", "env", "venv", "build", "dist", "migrations"]
+
+[tool.ruff.format]
+quote-style = "single"

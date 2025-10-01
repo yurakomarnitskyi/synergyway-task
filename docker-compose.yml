@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+  web:
+    build: .
+    command: >
+      bash -c "cd app && sleep 20 && 
+               python manage.py makemigrations &&
+               python manage.py migrate && 
+               python manage.py collectstatic --noinput &&
+               gunicorn app.wsgi:application --bind 0.0.0.0:8000"
+    volumes:
+      - .:/app/static
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+  celery:
+    build: .
+    command: bash -c "cd app && celery -A app worker -l info"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+      - web
+  celery-beat:
+    build: .
+    command: bash -c "cd app && celery -A app beat -l info"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+      - web
