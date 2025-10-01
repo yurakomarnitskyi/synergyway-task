@@ -1,3 +1,10 @@
+## Deployment on AWS
+
+This project is deployed on an AWS EC2 instance using Docker containers.
+Access the application via the public IP and port: http://51.20.185.234:8000/.
+
+All required ports are open in the EC2 Security Group, and Django is configured to allow connections from this IP.
+
 ## Full Docker workflow
 
 ### 1. Clone the repository
