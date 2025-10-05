@@ -7,7 +7,9 @@ from .models import User, Address, CreditCard
 
 @shared_task
 def fetch_and_save_next_user():
-    users_url = os.environ.get('USERS_API_URL', 'https://jsonplaceholder.typicode.com/users')
+    users_url = os.environ.get(
+        'USERS_API_URL', 'https://jsonplaceholder.typicode.com/users'
+    )
     response = requests.get(users_url)
     response.raise_for_status()
     users = response.json()
@@ -34,7 +36,9 @@ def fetch_and_save_address_for_user(user_id):
         user = User.objects.get(id=user_id)
     except User.DoesNotExist:
         return
-    address_url = os.environ.get('ADDRESS_API_URL', 'https://my.api.mockaroo.com/adderss.json?key=1354ffd0')
+    address_url = os.environ.get(
+        'ADDRESS_API_URL', 'https://my.api.mockaroo.com/address.json?key=1354ffd0'
+    )
     response = requests.get(address_url)
     if response.status_code != 200:
         return
@@ -42,16 +46,13 @@ def fetch_and_save_address_for_user(user_id):
     if not isinstance(data, dict):
         data = data[0]
 
-    def safe_text(val):
-        return val if val not in (None, '', 'null') else 'Unknown'
-
     Address.objects.filter(user=user).delete()
     Address.objects.create(
         user=user,
-        street=safe_text(data.get('street')),
-        city=safe_text(data.get('city')),
-        state=safe_text(data.get('state')),
-        zip_code=safe_text(data.get('zip')),
+        street=data.get('street'),
+        city=data.get('city'),
+        state=data.get('state'),
+        zip_code=data.get('zip_code'),
     )
 
 
@@ -64,7 +65,10 @@ def fetch_and_save_credit_card_for_user(user_id):
         user = User.objects.get(id=user_id)
     except User.DoesNotExist:
         return
-    credit_card_url = os.environ.get('CREDIT_CARD_API_URL', 'https://my.api.mockaroo.com/credit_card.json?key=1354ffd0')
+    credit_card_url = os.environ.get(
+        'CREDIT_CARD_API_URL',
+        'https://my.api.mockaroo.com/credit_cards.json?key=1354ffd0',
+    )
     response = requests.get(credit_card_url)
     if response.status_code != 200:
         return

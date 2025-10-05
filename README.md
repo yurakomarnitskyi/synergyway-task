@@ -7,13 +7,17 @@ All required ports are open in the EC2 Security Group, and Django is configured 
 
 ## Full Docker workflow
 
-### 1. Clone the repository
-```sh
-git clone git@github.com:yurakomarnitskyi/synergyway-task.git
-cd synergyway-task
-```
+### 1. Clone the repository and navigate to project directory
 
-### 2. Build and start all containers
+### 2. Environment setup
+Copy the example environment file and configure your variables:
+```sh
+cp .env.example .env
+```
+Edit `.env` file with your specific settings (database credentials, API keys, etc.).
+**Note:** All services require the environment variables to be properly configured.
+
+### 3. Start all services
 ```sh
 docker-compose up --build
 ```
@@ -24,8 +28,14 @@ This will start:
 - PostgreSQL
 - Redis
 
-### 3. Access the API
+### 4. Access the API
 - Main API: http://localhost:8000/
+- Django Admin: http://localhost:8000/admin/
+
+#### Create superuser (for admin access):
+```sh
+docker-compose exec web python manage.py createsuperuser
+```
 
 #### How to test all API endpoints (full paths):
 - List users: `GET http://localhost:8000/api/users/`
@@ -39,26 +49,31 @@ You can test these endpoints using curl, httpie, Postman, or your browser (for G
 
 > **Note:** All containers (web, db, redis, celery, celery-beat) must be running for the following commands.
 
-### 4. Run tests
+### 5. Run tests
 ```sh
 docker-compose exec web pytest app/user/tests.py
 ```
 
-### 5. Lint code 
+```sh
+docker-compose exec web pytest app/user/test_tasks.py
+```
+
+
+### 6. Lint code 
 ```sh
 docker-compose exec web ruff check .
 ```
-### 6. Lint and auto-fix code
+### 7. Lint and auto-fix code
 ```sh
 docker-compose exec web ruff check . --fix
 ```
 
-### 7. Format code
+### 8. Format code
 ```sh
 docker-compose exec web ruff format .
 ```
 
-### 8. Stop all containers
+### 9. Stop all containers
 ```sh
 docker-compose down
 ```

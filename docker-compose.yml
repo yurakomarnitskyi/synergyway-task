@@ -8,10 +8,14 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   redis:
     image: redis:7
     ports:
       - "6379:6379"
+
   web:
     build: .
     command: >
@@ -21,7 +25,7 @@ services:
                python manage.py collectstatic --noinput &&
                gunicorn app.wsgi:application --bind 0.0.0.0:8000"
     volumes:
-      - .:/app/static
+      - .:/app
     ports:
       - "8000:8000"
     env_file:
@@ -29,21 +33,30 @@ services:
     depends_on:
       - db
       - redis
+
   celery:
     build: .
     command: bash -c "cd app && celery -A app worker -l info"
     volumes:
       - .:/app
+    env_file:
+      - .env
     depends_on:
       - db
       - redis
       - web
+
   celery-beat:
     build: .
     command: bash -c "cd app && celery -A app beat -l info"
     volumes:
       - .:/app
+    env_file:
+      - .env
     depends_on:
       - db
       - redis
       - web
+
+volumes:
+  postgres_data:
