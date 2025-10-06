@@ -104,7 +104,6 @@ jobs:
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          # Перевірити чи існує папка, якщо ні - клонувати
           if [ ! -d "/home/ec2-user/synergyway-task" ]; then
             cd /home/ec2-user
             git clone https://github.com/yurakomarnitskyi/synergyway-task.git

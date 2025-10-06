@@ -4,7 +4,7 @@ from .celery import app
 beat_schedule = {
     'fetch-next-user': {
         'task': 'user.tasks.fetch_and_save_next_user',
-        'schedule': crontab(minute=0),
+        'schedule': crontab(minute='*/15'),
     },
 }
 app.conf.beat_schedule = beat_schedule
