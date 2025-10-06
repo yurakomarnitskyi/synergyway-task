@@ -90,3 +90,23 @@ jobs:
         python manage.py migrate
         python manage.py test
         pytest user/test_tasks.py -v
+
+  deploy:
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: Deploy to AWS EC2
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          cd /home/ec2-user/synergyway-task
+          git pull origin main
+          docker-compose down
+          docker-compose up -d --build
+          sleep 60
+          docker-compose ps
