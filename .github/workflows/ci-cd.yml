@@ -104,9 +104,23 @@ jobs:
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
+          if [ ! -d "/home/ec2-user/synergyway-task" ]; then
+            cd /home/ec2-user
+            git clone https://github.com/yurakomarnitskyi/synergyway-task.git
+          fi
+          
           cd /home/ec2-user/synergyway-task
+          
           git pull origin main
+          
+          if [ ! -f ".env" ]; then
+            cp .env.example .env
+          fi
+          
           docker-compose down
+
           docker-compose up -d --build
+          
           sleep 60
+          
           docker-compose ps
